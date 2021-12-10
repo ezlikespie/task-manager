@@ -18,6 +18,8 @@ const Home = ({themeCallback}) => {
     const [showError, setShowError] = useState(false)
     const [darkMode, setDarkMode] = useState(false)
     const [sort, setSort] = useState(1)
+    const [filterData, setFilterData] = useState({"class":"","priority":"","startDate":new Date(),"endDate":new Date()})
+    const [filter, setFilter] = useState([])
     const [createData, setCreateData] = useState(TASK_PROTOTYPE)
 
     const addTask = () => {
@@ -42,7 +44,6 @@ const Home = ({themeCallback}) => {
         setTasks(tasks.filter(function(task) { 
             return task["id"] !== id 
         }))
-        console.log(tasks.length)
     }
     const editTask = (id, task) => {
         var curTask = findElementById(tasks, id)
@@ -81,6 +82,17 @@ const Home = ({themeCallback}) => {
             return (a["Priority"] > b["Priority"])?1:-1
         if(sort==5)
             return (a["Priority"] < b["Priority"])?1:-1
+    }
+    const filterTasks = (task) => {
+        console.log(filterData["class"]!="")
+        if(filter.includes(1)&&filterData["class"]!=""&&!task["Class"].toLowerCase().startsWith(filterData["class"].toLowerCase()))
+            return false
+        if(filter.includes(2)&&filterData["priority"]!=""&&filterData["priority"]!=task["Priority"])
+            return false
+        if(filter.includes(3))
+            if(!(filterData["startDate"]<=task["Date"]&&filterData["endDate"]>=task["Date"]))
+                return false
+        return true
     }
 
     return (
@@ -125,7 +137,7 @@ const Home = ({themeCallback}) => {
                 </div>
                 </Card>
                 <FormControl>
-                    <InputLabel id="demo-simple-select-label">Sort</InputLabel>
+                    <InputLabel>Sort</InputLabel>
                     <Select
                         value={sort}
                         label="Sort"
@@ -138,12 +150,33 @@ const Home = ({themeCallback}) => {
                         <MenuItem value={5}>Priority Descending</MenuItem>
                     </Select>
                 </FormControl>
+                <FormControl style={{minWidth: "160px", marginLeft: "8px"}}>
+                    <InputLabel>Filter</InputLabel>
+                    <Select
+                        value={filter}
+                        multiple
+                        label="Filter"
+                        onChange={(e)=>setFilter(e.target.value)}
+                    >
+                        <MenuItem value={1}>Class</MenuItem>
+                        <MenuItem value={2}>Priority</MenuItem>
+                        <MenuItem value={3}>Date</MenuItem>
+                    </Select>
+                </FormControl>
+                <TextField label="Filter Class" style={{display: (filter.includes(1))?"inline-block":"none", minWidth: "160px", marginLeft: "8px"}} variant="outlined" value={filterData["class"]} onChange={(e) => setFilterData({...filterData, ...createObject("class", e.target.value) }) } />
+                <TextField label="Filter Priority" style={{display: (filter.includes(2))?"inline-block":"none", minWidth: "160px", marginLeft: "8px"}} variant="outlined" value={filterData["priority"]} onChange={(e) => setFilterData({...filterData, ...createObject("priority", e.target.value) }) } />
+                <div style={{display: (filter.includes(3))?"inline-block":"none", marginLeft:"8px"}}>
+                <InputLabel>Start Date</InputLabel>
+                <DatePicker selected={filterData["startDate"]} onChange={(date) => setFilterData({...filterData, ...createObject("startDate", date) })} />
+                <InputLabel>End Date</InputLabel>
+                <DatePicker style={{marginLeft: "8px"}} selected={filterData["endDate"]} onChange={(date) => setFilterData({...filterData, ...createObject("endDate", date) })} />
+                </div>
             </div>
             <div>
                 
             </div>
             <div style={{marginTop: "10px"}}>
-                {tasks.sort(sortTasks).map((task) => (
+                {tasks.filter(filterTasks).sort(sortTasks).map((task) => (
                     <Task task={task} callbackDelete={removeTask} callbackEdit={editTask} uuid={task["id"]} />
                 ))}
             </div>

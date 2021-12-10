@@ -75,6 +75,12 @@ const Home = ({themeCallback}) => {
             return (a["Date"] > b["Date"])?1:-1
         if(sort==2)
             return (a["Date"] < b["Date"])?1:-1
+        if(sort==3)
+            return (a["Class"] > b["Class"])?1:-1
+        if(sort==4)
+            return (a["Priority"] > b["Priority"])?1:-1
+        if(sort==5)
+            return (a["Priority"] < b["Priority"])?1:-1
     }
 
     return (
@@ -128,7 +134,8 @@ const Home = ({themeCallback}) => {
                         <MenuItem value={1}>Date Ascending</MenuItem>
                         <MenuItem value={2}>Date Descending</MenuItem>
                         <MenuItem value={3}>Class</MenuItem>
-                        <MenuItem value={4}>Priority</MenuItem>
+                        <MenuItem value={4}>Priority Ascending</MenuItem>
+                        <MenuItem value={5}>Priority Descending</MenuItem>
                     </Select>
                 </FormControl>
             </div>
